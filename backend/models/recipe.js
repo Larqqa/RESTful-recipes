@@ -33,7 +33,11 @@ const recipeSchema = new database.Schema({
     type: String,
     required: true,
     unique: true,
-  }
+  },
+  userID: {
+    type: String,
+    required: true,
+  },
 })
 
 recipeSchema.set('toJSON', {

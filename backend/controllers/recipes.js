@@ -1,5 +1,6 @@
 const recipesRouter = require('express').Router()
 const Recipe = require('../models/recipe')
+const User = require('../models/user')
 const crypto = require('crypto')
 
 recipesRouter.get('/', (req, res) => {
@@ -34,11 +35,18 @@ recipesRouter.post('/', async (req, res, next) => {
     servings: body.servings,
     timeToMake: body.timeToMake,
     recipeID: crypto.randomBytes(20).toString('hex'),
+    userID: body.userID,
   })
 
-  try { 
-    const saved = await recipe.save()
-    res.json(saved.toJSON())
+  try {
+    const user = await User.findById(body.userID)
+    if (user) {
+      const saved = await recipe.save()
+      res.json(saved.toJSON())
+    } else {
+      res.status(404).end()
+    }
+
   } catch(exception) {
     next(exception)
   }
