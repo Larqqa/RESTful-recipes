@@ -29,11 +29,6 @@ const recipeSchema = new database.Schema({
   },
   servings: Number,
   timeToMake: Number,
-  recipeID: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   userID: {
     type: String,
     required: true,
