@@ -1,6 +1,8 @@
 import React from 'react'
 
 const HeroRecipe = ({recipe, font, handleOpen, handleChange}) => {
+
+  if(!recipe) return <></>
   return (
     <div className="hero" id="hero" style={{opacity:1, pointerEvents: 'all'}}>
       <div>

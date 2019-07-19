@@ -1,13 +1,27 @@
 import React from 'react'
+import recipesService from '../../services/recipes'
 
-function Recipe({recipe, goTo, goToEdit, dest, user}) {
-  if(!recipe) return <></>
+function Recipe({recipe, goTo, goToEdit, dest, user, delRecipe, match, setRecipe, Link}) {
+  if(!recipe) {
+    console.log(match.params.id)
+    recipesService
+    .getOneByTitle(match.params.id.replace('_', ' '))
+    .then(recipe => {
+      setRecipe(recipe)
+    })
+    return <></>
+  }
 
   return (
     <div id="recipe">
       <div>
-        <button onClick={goTo} value={dest} >Takaisin</button>
-        {user && user.id === recipe.userID ? <button onClick={goToEdit} value={`${recipe.id}:addRecipe`}>Muokkaa</button> : false}
+        {dest !== '/' ? <Link to={`/${dest}`}><button>Takaisin</button></Link> : <Link to='/' ><button>Etusivulle</button></Link>}
+        {user && user.id === recipe.userID ?
+          <>
+          <Link to={`/editRecipe/${recipe.id}`} ><button>Muokkaa</button></Link>
+          <button onClick={delRecipe} value={`${recipe.id}`}>Poista</button>
+          </>
+        : false}
         <h3>{recipe.title}</h3>
         <p>- {recipe.category} -</p>
         <p>{recipe.description}</p>

@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 import {Redirect} from 'react-router'
 import anime from 'animejs'
 
+import './App.scss'
+
 import recipesService from './services/recipes'
 import userService from './services/user'
 import loginService from './services/login'
@@ -16,22 +18,20 @@ import MyRecipes from './components/model/MyRecipes'
 import Recipe from './components/model/Recipe'
 import User from './components/model/User'
 import AddRecipe from './components/model/AddRecipe'
+import EditRecipe from './components/model/EditRecipe'
 import HeroRecipe from './components/model/HeroRecipe'
 
-import './App.scss'
 
 function App() {
-  const [recipes, setRecipes] = useState('')
-  const [heroRecipe, setHeroRecipe] = useState('')
-  const [recipe, setRecipe] = useState('')
-  const [lastTarget, setLastTarget] = useState('hero')
-  const [animationClicked, setanimationClicked] = useState(false)
-  const [editableRecipe, setEditableRecipe] = useState('')
+  const [recipes, setRecipes] = useState()
+  const [heroRecipe, setHeroRecipe] = useState()
+  const [recipe, setRecipe] = useState()
   const [user, setUser] = useState()
-  const [userRecipes, setUserRecipes] = useState('')
+  const [userRecipes, setUserRecipes] = useState()
   const [dest, setDest] = useState()
   const [font, setFont] = useState("'Bangers', cursive")
   const [redirect, setRedirect] = useState()
+  const [editable, setEditable] = useState({})
 
   const fonts = [
     "'Bangers', cursive",
@@ -120,7 +120,7 @@ function App() {
       setRecipe(recipe)
       setDest(vals[1])
       setRedirect()
-      setRedirect('/recipe')
+      setRedirect(`/recipe/${recipe.title.replace(' ', '_')}`)
     })
   }
 
@@ -129,18 +129,6 @@ function App() {
 
     setRedirect()
     setRedirect(e.target.value)
-  }
-
-  const goToEdit = (e) => {
-    e.preventDefault()
-    const vals = e.target.value.split(':')
-    recipesService
-    .getOne(vals[0])
-    .then(recipe => {
-      setEditableRecipe(recipe)
-      setRedirect()
-      setRedirect(vals[1])
-    })
   }
 
   const loginHandler = (e) => {
@@ -205,9 +193,9 @@ function App() {
         .getAllById(user.id)
         .then(recipes => {
           setUserRecipes(recipes)
-          setRedirect()
-          setRedirect('/recipe')
         })
+        setRedirect()
+        setRedirect(`/recipe/${res.title.replace(' ', '_')}`)
       })
     } else {
       recipesService
@@ -223,9 +211,10 @@ function App() {
         .getAllById(user.id)
         .then(recipes => {
           setUserRecipes(recipes)
-          setRedirect()
-          setRedirect('/recipe')
         })
+        setDest('myRecipes')
+        setRedirect()
+        setRedirect(`/recipe/${res.title.replace(' ', '_')}`)
       })
     }
   }
@@ -240,7 +229,6 @@ function App() {
       setUser('')
       setRedirect()
       setRedirect('/')
-      console.log(lastTarget)
     })
   }
 
@@ -261,8 +249,41 @@ function App() {
     })
   }
 
+  const delUser = (e) => {
+    e.preventDefault()
+
+    userService
+    .del(user.username, window.prompt("Oletko varma että haluat poistaa käyttäjätilisi? Anna salasana ja paina ok."), user.loginKEY)
+    .then(() => {
+      setUser()
+      setRedirect()
+      setRedirect('/')
+    })
+  }
+
+  const delRecipe = (e) => {
+    e.preventDefault()
+
+    if(window.confirm("Oletko varma että haluat poistaa tämän reseptin?")) {
+      recipesService
+      .del(e.target.value, user.id, user.loginKEY)
+      .then(() => {
+        setUser(user)
+        recipesService
+        .getAllById(user.id)
+        .then(recipes => {
+          setUserRecipes(recipes)
+          setRedirect()
+          setRedirect('/myRecipes')
+      })
+      })
+    } else {
+      return
+    }
+
+  }
   const clearEdit = () => {
-    setEditableRecipe({})
+    setEditable({})
   }
 
   return (
@@ -311,21 +332,24 @@ function App() {
             {...routeProps}
             {...{
               user: user,
-              handleUserChange: handleUserChange
+              handleUserChange: handleUserChange,
+              delUser: delUser
             }} />
           )}
         />
 
-        <Route path='/recipe'
+        <Route path='/recipe/:id'
           render={(routeProps) => (
             <Recipe
             {...routeProps}
             {...{
               recipe: recipe,
               goTo: goTo,
-              goToEdit: goToEdit,
               dest: dest,
-              user: user
+              user: user,
+              delRecipe: delRecipe,
+              setRecipe: setRecipe,
+              Link: Link
             }} />
           )}
         />
@@ -352,14 +376,26 @@ function App() {
           )}
         />
 
-        <Route path='/addRecipe'
+        <Route path='/addRecipe/'
           render={(routeProps) => (
             <AddRecipe
             {...routeProps}
             {...{
               user: user,
               createRecipeHandler: createRecipeHandler,
-              editableRecipe: editableRecipe
+              editable, setEditable
+            }} />
+          )}
+        />
+
+        <Route path='/editRecipe/:id'
+          render={(routeProps) => (
+            <EditRecipe
+            {...routeProps}
+            {...{
+              user: user,
+              createRecipeHandler: createRecipeHandler,
+              editable, setEditable
             }} />
           )}
         />

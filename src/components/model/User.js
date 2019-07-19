@@ -1,6 +1,6 @@
 import React from 'react'
 
-function User({user, handleUserChange}) {
+function User({user, handleUserChange, delUser}) {
   if(!user) return <div id="user"></div>
   return (
     <div id="user">
@@ -16,6 +16,7 @@ function User({user, handleUserChange}) {
           <input placeholder="Uusi salasana" name="newPass" />
           <button>Lähetä</button>
         </form>
+        <button onClick={delUser}>Poista käyttäjä</button>
       </div>
     </div>
   )

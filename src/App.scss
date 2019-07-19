@@ -66,6 +66,7 @@ form {
 }
 
 button {
+  max-width: 200px;
   position: relative;
   border: none;
   font-weight: bold;
@@ -79,7 +80,7 @@ button {
   top: 0;
   left: 0;
   width: 100%;
-  max-width: 150px;
+  margin-top: 1rem;
   transition: box-shadow .2s, top .3s, left .3s, color .2s;
   &:hover {
     top: -2px;

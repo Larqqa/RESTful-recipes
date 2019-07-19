@@ -27,6 +27,18 @@ recipesRouter.get('/:id', async (req, res, next) => {
   }
 })
 
+recipesRouter.get('/title/:title', async (req, res, next) => {
+  try{
+    const recipe = await Recipe.findOne({title: req.params.title})
+    if (recipe) {
+      res.json(recipe.toJSON())
+    } else {
+      res.status(404).end()
+    }
+  } catch(exception) {
+    next(exception)
+  }
+})
 
 recipesRouter.post('/:loginKEY', async (req, res, next) => {
   const body = req.body

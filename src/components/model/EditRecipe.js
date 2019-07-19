@@ -1,13 +1,24 @@
 import React from 'react'
+import recipesService from '../../services/recipes'
 
-function AddRecipe({user, createRecipeHandler, editable, setEditable}) {
+function EditRecipe({user, createRecipeHandler, editable, setEditable, match}) {
   if(!user) return <></>
+
+  if(!editable.title && match.params.id) {
+    recipesService
+    .getOne(match.params.id, '')
+    .then(recipe => {
+      setEditable({...recipe})
+      return <></>
+    })
+  }
   
   const handleChange = (e) => {
     const edit = editable
     edit[e.target.name] = e.target.value
     setEditable({...edit})
   }
+
 
   return (
     <div id="addRecipe">
@@ -28,7 +39,7 @@ function AddRecipe({user, createRecipeHandler, editable, setEditable}) {
             <textarea name="steps" value={editable.steps || ''} onChange={handleChange} placeholder="Vaiheet (erota pilkulla)" rows="5" />
             <input name="servings" type="number" value={editable.servings || ''} onChange={handleChange} placeholder="Annokset" />
             <input name="timeToMake" type="number" value={editable.timeToMake || ''} onChange={handleChange} placeholder="Valmistus aika" />
-            <input type="hidden" name="editId" value='' />
+            <input type="hidden" name="editId" value={match.params.id || ''} />
             <button>Lisää</button>
           </form>
         </div>
@@ -37,4 +48,4 @@ function AddRecipe({user, createRecipeHandler, editable, setEditable}) {
   )
 }
 
-export default AddRecipe
+export default EditRecipe

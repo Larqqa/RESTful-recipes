@@ -22,7 +22,7 @@ function Recipes({recipes, handleOpen}) {
           <div className="recipe__Header">
             <h1>Uusimpia reseptejä:</h1>
             <Select />
-            {recipes.map((recipe, i) => <Recipe key={i} recipe={recipe} />)}
+            {recipes.map((recipe, i) => <Recipe key={i} recipe={recipe}/>)}
           </div>
         </div>
       </div>

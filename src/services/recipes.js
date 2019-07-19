@@ -16,6 +16,11 @@ const getOne = (id) => {
   return request.then(response => response.data)
 }
 
+const getOneByTitle = (title) => {
+  const request = axios.get(`${baseUrl}/title/${title}`)
+  return request.then(response => response.data)
+}
+
 const create = (loginKEY, body) => {
   const request = axios.post(`${baseUrl}/${loginKEY}`, body)
   return request.then(response => response.data)
@@ -31,4 +36,4 @@ const edit = (id, userID, loginKEY, body) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, getAllById, getOne, create, del, edit}
+export default { getAll, getAllById, getOne, getOneByTitle, create, del, edit}
