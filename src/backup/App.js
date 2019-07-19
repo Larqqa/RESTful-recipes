@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
-import {Redirect} from 'react-router'
 import anime from 'animejs'
 
 import recipesService from './services/recipes'
@@ -31,7 +29,6 @@ function App() {
   const [userRecipes, setUserRecipes] = useState('')
   const [dest, setDest] = useState()
   const [font, setFont] = useState("'Bangers', cursive")
-  const [redirect, setRedirect] = useState()
 
   const fonts = [
     "'Bangers', cursive",
@@ -74,8 +71,61 @@ function App() {
     setFont(fonts[Math.floor(Math.random() * fonts.length)])
     setHeroRecipe(recipes[rand])
   }
-
+  
   /*
+  const handleFront = (e) => {
+    e.preventDefault()
+    animate(lastTarget, 'hero')
+
+  }
+  
+  const handleRecipes = (e) => {
+    e.preventDefault()
+    animate(lastTarget, 'recipes')
+  }
+
+  const handleLogin = (e) => {
+    e.preventDefault()
+    animate(lastTarget, 'loginForm')
+  }
+
+  const handleRegistration = (e) => {
+    e.preventDefault()
+    animate(lastTarget, 'registrationForm')
+  }
+
+  const handleUser = (e) => {
+    e.preventDefault()
+    animate(lastTarget, 'user')
+  }
+
+  const handleAddRecipe = (e) => {
+    e.preventDefault()
+    setEditableRecipe('')
+    animate(lastTarget, 'addRecipe')
+  }
+  
+  const goTo = (e) => {
+    animate(lastTarget, e.target.value)
+  }
+
+  const goToEdit = (e) => {
+    const tar = e.target.value.split(':')
+    recipesService
+    .getOne(tar[0])
+    .then(recipe => {
+      setEditableRecipe(recipe)
+      animate(lastTarget, tar[1])
+    })
+  }
+
+  const handleMyRecipes = (e) => {
+    e.preventDefault()
+    animate(lastTarget, 'myRecipes')
+  }
+  HANDLE ANIMATION CHANGES END */
+
+  /* HANDLE VALUE CHANGING */
   const animate = (lastTar, newTar) => {
     const animSpeed = 250
 
@@ -108,38 +158,15 @@ function App() {
       }
     })
   }
-  */
 
   const handleOpen = (e) => {
-    e.preventDefault()
-
     const vals = e.target.value.split(':')
     recipesService
     .getOne(vals[0])
     .then(recipe => {
-      setRecipe(recipe)
+      animate(lastTarget, 'recipe')
       setDest(vals[1])
-      setRedirect()
-      setRedirect('/recipe')
-    })
-  }
-
-  const goTo = (e) => {
-    e.preventDefault()
-
-    setRedirect()
-    setRedirect(e.target.value)
-  }
-
-  const goToEdit = (e) => {
-    e.preventDefault()
-    const vals = e.target.value.split(':')
-    recipesService
-    .getOne(vals[0])
-    .then(recipe => {
-      setEditableRecipe(recipe)
-      setRedirect()
-      setRedirect(vals[1])
+      setRecipe(recipe)
     })
   }
 
@@ -152,8 +179,7 @@ function App() {
       console.log(user)
       setUser(user)
       loginSessions.saveLogin(user)
-      setRedirect()
-      setRedirect('/')
+      animate(lastTarget, 'hero')
     })
   }
 
@@ -171,8 +197,7 @@ function App() {
       console.log(user)
       setUser(user)
       loginSessions.saveLogin(user)
-      setRedirect()
-      setRedirect('/')
+      animate(lastTarget, 'user')
     })
   }
 
@@ -195,36 +220,32 @@ function App() {
       recipesService
       .edit(e.target.editId.value, user.id, user.loginKEY, obj)
       .then(res => {
-        setRecipe(res)
         recipesService
         .getAll()
         .then(recipes => {
           setRecipes(recipes)
+          animate(lastTarget, 'hero')
         })
         recipesService
         .getAllById(user.id)
         .then(recipes => {
           setUserRecipes(recipes)
-          setRedirect()
-          setRedirect('/recipe')
         })
       })
     } else {
       recipesService
       .create(user.loginKEY, obj)
       .then(res => {
-        setRecipe(res)
         recipesService
         .getAll()
         .then(recipes => {
           setRecipes(recipes)
+          animate(lastTarget, 'hero')
         })
         recipesService
         .getAllById(user.id)
         .then(recipes => {
           setUserRecipes(recipes)
-          setRedirect()
-          setRedirect('/recipe')
         })
       })
     }
@@ -238,9 +259,8 @@ function App() {
     .logout(user.id, user.loginKEY)
     .then(res => {
       setUser('')
-      setRedirect()
-      setRedirect('/')
       console.log(lastTarget)
+      animate(lastTarget, 'hero')
     })
   }
 
@@ -260,112 +280,68 @@ function App() {
       setUser(res)
     })
   }
-
-  const clearEdit = () => {
-    setEditableRecipe({})
-  }
+  /* HANDLE VALUE CHANGES END */
 
   return (
-    <Router>
-      {redirect ? <Redirect to={redirect} /> : false}
-      <div className="App">
-        <div className="bg"></div>
-        <Navigation Link={Link} user={user} handleLogout={handleLogout} clearEdit={clearEdit} />
-        
-        <Route exact path='/'
-          render={(routeProps) => (
-            <HeroRecipe
-            {...routeProps}
-            {...{
-              font: font,
-              recipe: heroRecipe,
-              handleOpen: handleOpen,
-              handleChange: handleChange
-            }} />
-          )}
-        />
+    <div className="App">
+      <div className="bg"></div>
 
-        <Route path='/login'
-          render={(routeProps) => (
-            <Login
-            {...routeProps}
-            {...{
-              loginHandler: loginHandler
-            }} />
-          )}
-        />
+      <Navigation
+        handleLogin={handleLogin}
+        handleRegistration={handleRegistration}
+        handleFront={handleFront} handleRecipes={handleRecipes}
+        handleUser={handleUser}
+        user={user}
+        handleLogout={handleLogout}
+        handleAddRecipe={handleAddRecipe}
+        handleMyRecipes={handleMyRecipes}
+      />
 
-        <Route path='/register'
-          render={(routeProps) => (
-            <Register
-            {...routeProps}
-            {...{
-              registerHandler: registerHandler
-            }} />
-          )}
-        />
+      <Login
+        loginHandler={loginHandler}
+      />
 
-        <Route path='/user'
-          render={(routeProps) => (
-            <User
-            {...routeProps}
-            {...{
-              user: user,
-              handleUserChange: handleUserChange
-            }} />
-          )}
-        />
+      <Register
+        registerHandler={registerHandler}
+      />
 
-        <Route path='/recipe'
-          render={(routeProps) => (
-            <Recipe
-            {...routeProps}
-            {...{
-              recipe: recipe,
-              goTo: goTo,
-              goToEdit: goToEdit,
-              dest: dest,
-              user: user
-            }} />
-          )}
-        />
+      <User
+        user={user}
+        handleUserChange={handleUserChange}
+      />
 
-        <Route path='/recipes'
-          render={(routeProps) => (
-            <Recipes
-            {...routeProps}
-            {...{
-              recipes: recipes,
-              handleOpen: handleOpen
-            }} />
-          )}
-        />
+      <HeroRecipe
+        recipe={heroRecipe}
+        font={font}
+        handleOpen={handleOpen}
+        handleChange={handleChange}
+      />
 
-        <Route path='/myRecipes'
-          render={(routeProps) => (
-            <MyRecipes
-            {...routeProps}
-            {...{
-              recipes: userRecipes,
-              handleOpen: handleOpen
-            }} />
-          )}
-        />
+      <Recipe
+        recipe={recipe}
+        goTo={goTo}
+        goToEdit={goToEdit}
+        dest={dest}
+        user={user}
+      />
 
-        <Route path='/addRecipe'
-          render={(routeProps) => (
-            <AddRecipe
-            {...routeProps}
-            {...{
-              user: user,
-              createRecipeHandler: createRecipeHandler,
-              editableRecipe: editableRecipe
-            }} />
-          )}
-        />
+      <Recipes
+        recipes={recipes}
+        handleOpen={handleOpen}
+      />
 
-      </div>
-    </Router>
+      <MyRecipes
+        recipes={userRecipes}
+        handleOpen={handleOpen}
+      />
+
+      <AddRecipe
+        user={user}
+        createRecipeHandler={createRecipeHandler}
+        editableRecipe={editableRecipe}
+      />
+
+    </div>
   )
 }
 

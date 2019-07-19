@@ -8,6 +8,12 @@ recipesRouter.get('/', (req, res) => {
   })
 })
 
+recipesRouter.get('/user/:id', (req, res) => {
+  Recipe.find({userID: req.params.id}).then(recipes => {
+    res.json(recipes.map(recipe => recipe.toJSON()))
+  })
+})
+
 recipesRouter.get('/:id', async (req, res, next) => {
   try{
     const recipe = await Recipe.findById(req.params.id)
@@ -82,9 +88,12 @@ recipesRouter.put('/:id&:userID&:loginKEY', async (req, res, next) => {
           timeToMake: body.timeToMake,
         }
 
+        Object.keys(recipe).forEach(key => {
+          if(!recipe[key]) delete recipe[key]
+        })
+        
         const newRecipe = await Recipe.findByIdAndUpdate(req.params.id, recipe, { new: true})
         res.json(newRecipe.toJSON())
-
       } catch (exception) {
         next(exception)
       }

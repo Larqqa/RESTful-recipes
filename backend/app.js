@@ -13,8 +13,8 @@ require('./utils/dbconnect')
 logger.info('connecting to', config.USERS_URI)
 logger.info('connecting to', config.RECIPES_URI)
 
-app.use(cors())
 app.use(express.static('build'))
+app.use(cors())
 app.use(bodyParser.json())
 app.use(middleware.requestLogger)
 

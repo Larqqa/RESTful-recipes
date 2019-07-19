@@ -19,7 +19,8 @@ const userSchema = new database.Schema({
   },
   email: {
     type: String,
-    unique: true
+    unique: true,
+    minlength: 4
   },
   loginKEY: String
 })

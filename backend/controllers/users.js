@@ -3,7 +3,7 @@ const User = require('../models/user')
 const Hash = require('../utils/hash')
 
 usersRouter.get('/', (req, res) => {
-  User.find({}).then(users => {
+  User.find({},'username id').then(users => {
     res.json(users.map(user => user.toJSON()))
   })
 })
@@ -28,8 +28,9 @@ usersRouter.post('/', (req, res, next) => {
       try { 
         const user = new User({
           username: body.username,
-          password: hashedPass,
           email: body.email,
+          password: hashedPass,
+          loginKEY: Hash.TWENTY,
         })
         const saved = await user.save()
         res.json(saved.toJSON())
@@ -63,19 +64,24 @@ usersRouter.delete('/:username&:password&:loginKEY', async (req, res, next) => {
 })
 
 usersRouter.put('/:username&:password&:loginKEY', async (req, res, next) => {
-  try { 
+  try {
     const user = await User.findOne({username: req.params.username})
     if(!user || !user.loginKEY) return res.status(404).end()
     
     const body = req.body
-    if(!body.password) {
-      
+    if(req.params.password === 0) {
+      console.log("no password")
       const userChange = {
         username: body.username,
         email: body.email
       }
+
+      Object.keys(userChange).forEach(key => {
+        if(!userChange[key]) delete userChange[key]
+      })
+      
       try{
-        const newUser = await User.findByIdAndUpdate(user.id, userChange, { new: true, select: 'username email id' })
+        const newUser = await User.findByIdAndUpdate(user.id, userChange, { new: true, select: 'username email id  loginKEY' })
         res.json(newUser.toJSON())
         return res.status(204).end()
       } catch (exception) {
@@ -93,10 +99,17 @@ usersRouter.put('/:username&:password&:loginKEY', async (req, res, next) => {
                 const userChange = {
                   username: body.username,
                   email: body.email,
-                  passwod: hashedPass
+                  password: hashedPass
                 }
+
+                Object.keys(userChange).forEach(key => {
+                  if(!userChange[key]) delete userChange[key]
+                })
+
+                console.log(userChange)
+
                 try{
-                  const newUser = await User.findByIdAndUpdate(user.id, userChange, { new: true, select: 'username email id' })
+                  const newUser = await User.findByIdAndUpdate(user.id, userChange, { new: true, select: 'username email id loginKEY' })
                   res.json(newUser.toJSON())
                   res.status(204).end()
                 } catch (exception) {
@@ -107,6 +120,8 @@ usersRouter.put('/:username&:password&:loginKEY', async (req, res, next) => {
           } catch (exception) {
             next(exception)
           }
+        } else {
+          res.status(404).end()
         }
       }
     )
