@@ -8,13 +8,14 @@ const loginoutRouter = require('./controllers/loginouts')
 const recipesRouter = require('./controllers/recipes')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
-require('./utils/dbconnect')
 
 logger.info('connecting to', config.USERS_URI)
 logger.info('connecting to', config.RECIPES_URI)
 
-app.use(express.static('build'))
+require('./utils/dbconnect')
+
 app.use(cors())
+app.use(express.static('build'))
 app.use(bodyParser.json())
 app.use(middleware.requestLogger)
 

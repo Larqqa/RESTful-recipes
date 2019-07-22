@@ -2,11 +2,13 @@ const loginoutRouter = require('express').Router()
 const User = require('../models/user')
 const Hash = require('../utils/hash')
 
+// Handle login
 loginoutRouter.post('/login/:username&:password', async (req, res, next) => {
   const uName = req.params.username
   try { 
-    const user = await User.findOne({username: new RegExp(uName, 'i')})
-    if(!user) return res.status(404).end()
+    const userArr = await User.find({username: uName})
+    const user = userArr[0]
+    if(!user) return res.status(404).send('Väärä käyttäjänimi').end()
     
     Hash.verify(req.params.password, user.password,
       async (verify) => {
@@ -25,7 +27,7 @@ loginoutRouter.post('/login/:username&:password', async (req, res, next) => {
           }
         } else {
           next(new Error('wrong password was given'))
-          res.status(404).end()
+          res.status(404).send('Väärä salasana').end()
         }
       }
     )
@@ -34,10 +36,13 @@ loginoutRouter.post('/login/:username&:password', async (req, res, next) => {
   }
 })
 
+// Handle authentication
+// Not used atm.
 loginoutRouter.post('/auth/:username&:password&:loginKEY', async (req, res, next) => {
   try { 
-    const user = await User.findOne({username: new RegExp(req.params.username, 'i')})
-    if(!user || !user.loginKEY) return res.status(404).end()
+    const userArr = await User.find({username: req.params.username})
+    const user = userArr[0]
+    if(!user.username || !user.loginKEY) return res.status(404).send('Väärä käyttäjänimi, tai ei sisäänkirjautumista').end()
 
     Hash.verify(req.params.password, user.password,
       (verify) => {
@@ -50,6 +55,7 @@ loginoutRouter.post('/auth/:username&:password&:loginKEY', async (req, res, next
   }
 })
 
+// handle logout
 loginoutRouter.post('/logout/:id&:loginKEY', async (req, res, next) => {
   const id = req.params.id
   const loginKEY = req.params.loginKEY

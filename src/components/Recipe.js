@@ -1,0 +1,46 @@
+import React from 'react'
+import recipesService from '../services/recipes'
+
+function Recipe({recipe, dest, user, delRecipe, match, setRecipe, Link, setEditable}) {
+  // Reset edit form
+  setEditable('')
+
+  // if no recipe, for example page refresh, parse title from url and fetch recipe with title
+  if(!recipe) {
+    recipesService.getOneByTitle(match.params.id.replace('_', ' '))
+    .then(recipe => {
+      setRecipe(recipe)
+    })
+    
+    // "re-render"
+    return <></>
+  }
+
+  return (
+    <div id="recipe">
+      {dest !== '/' && dest ? <Link to={`/${dest}`}><button>Takaisin</button></Link> : <Link to='/' ><button>Etusivulle</button></Link>}
+      {user && user.id === recipe.userID ?
+        <>
+        <Link to={`/editRecipe/${recipe.id}`} ><button>Muokkaa</button></Link>
+        <button onClick={delRecipe} value={`${recipe.id}`}>Poista</button>
+        </>
+      : false}
+      <h3>{recipe.title}</h3>
+      <p>{recipe.group.map((group, i) => i === 0 && group ? `- ${group}  - ` : `${group}  - `)}</p>
+      <p>- {recipe.category} -</p>
+      <p>{recipe.description}</p>
+      <p><b>Ainekset:</b></p>
+      <ul>
+        {recipe.ingredients.map((ingredient, i) => <li key={i}><label><input type="checkbox" /> {ingredient}</label></li>)}
+      </ul>
+      <p><b>Valmistus:</b></p>
+      <ol>
+        {recipe.steps.map((steps, i) => <li key={i}>{steps}</li>)}
+      </ol>
+      <p><b>Annoksia:</b> {recipe.servings} {recipe.servings > 1 ? "lautasellista" : "lautasellinen"}</p>
+      <p><b>Valmistuksen kesto:</b> n. {`${recipe.timeToMake} minuuttia`}</p>
+    </div>
+  )
+}
+
+export default Recipe

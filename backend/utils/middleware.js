@@ -8,10 +8,12 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
+// Wrong url address
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
+// Wrong id
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message)
 

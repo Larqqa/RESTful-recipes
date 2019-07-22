@@ -9,18 +9,16 @@ const userSchema = new database.Schema({
   username: {
     type: String,
     required: true,
-    minlength: 2,
+    minlength: 4,
     unique: true
   },
   password: {
     type: String,
-    required: true,
     minlength: 6
   },
   email: {
     type: String,
     unique: true,
-    minlength: 4
   },
   loginKEY: String
 })

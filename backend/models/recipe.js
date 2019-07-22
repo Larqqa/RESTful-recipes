@@ -10,6 +10,7 @@ const recipeSchema = new database.Schema({
     type: String,
     required: true,
   },
+  group: Array,
   title: {
     type: String,
     required: true,
