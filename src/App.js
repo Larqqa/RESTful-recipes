@@ -50,7 +50,8 @@ function App() {
     'Pääruoka',
     'Välipala',
     'Iltapala',
-    'Jälkiruoka'
+    'Jälkiruoka',
+    'Herkku'
   ]
 
   // Pre-set groups
