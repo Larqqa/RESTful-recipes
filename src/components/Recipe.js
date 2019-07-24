@@ -28,8 +28,8 @@ function Recipe({recipe, dest, user, delRecipe, match, setRecipe, Link, setEdita
         : false}
       </div>
       <h1>{recipe.title}</h1>
-      {recipe.group.length > 0 ? <p>{recipe.group.map((group, i) => i === 0 && group ? `- ${group}  - ` : `${group}  - `)}</p> : null}
       <p>- {recipe.category} -</p>
+      {recipe.group.length > 0 ? <p>{recipe.group.map((group, i) => i === 0 && group ? `- ${group}  - ` : `${group}  - `)}</p> : null}
       <p>{recipe.description}</p>
       <p><b>Ainekset:</b></p>
       <ul>
