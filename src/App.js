@@ -87,8 +87,7 @@ function App() {
   // On init get recipes and check if user is logged in
   useEffect(() => {
 
-    // On load hide loader
-    window.addEventListener('load', () => {
+    const hideLoader = () => {
 
       // Animate loader, after animation remove from DOM
       const loader = document.getElementById('loader')
@@ -102,7 +101,11 @@ function App() {
           loader.remove()
         }
       })
-      
+    }
+
+    // On load hide loader
+    window.addEventListener('load', () => {
+      hideLoader()
       console.log('Page fully loaded')
     })
     

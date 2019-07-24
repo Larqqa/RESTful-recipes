@@ -612,3 +612,20 @@ footer {
     }
   }
 }
+
+@media screen and (max-width: 650px) {
+  footer {
+    flex-wrap: wrap;
+    a, p {
+      padding-bottom: padding(small);
+    }
+
+    #copyright {
+      width: 100%;
+    }
+    
+    #spacer {
+      display: none;
+    }
+  }
+}

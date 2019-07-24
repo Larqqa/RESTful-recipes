@@ -11,6 +11,9 @@ function EditRecipe({user, createRecipeHandler, editable, setEditable, match, ca
     recipesService
     .getOne(match.params.id, '')
     .then(recipe => {
+      console.log(recipe)
+      recipe.ingredients = recipe.ingredients.join('\n')
+      recipe.steps = recipe.steps.join('\n')
       setEditable({...recipe})
 
       // Set checkboxes to the array from the recipe
