@@ -1,6 +1,6 @@
 /* MAIN */
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
+import { HashRouter, Route, Link } from "react-router-dom"
 import {Redirect} from 'react-router'
 import Anime from 'animejs'
 import './App.scss'
@@ -662,7 +662,7 @@ function App() {
   /* ------------UTILITY END------------ */
 
   return (
-    <Router>
+    <HashRouter>
       <ScrollToTop>
         <div id="error"><p>{error}</p></div>
         <div id="loader"><h1>Ladataan</h1></div>
@@ -815,7 +815,7 @@ function App() {
         </div>
         <Footer />
       </ScrollToTop>
-    </Router>
+    </HashRouter>
   )
 }
 
