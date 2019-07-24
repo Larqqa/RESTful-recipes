@@ -29,8 +29,8 @@ function AddRecipe({user, createRecipeHandler, cat, group, handleGroup, addArray
 
         <input name="title" placeholder="Otsikko" required />
         <textarea name="description" placeholder="Kuvaus" rows="5" required />
-        <textarea name="ingredients" placeholder="Ainekset (erota pilkulla)" rows="5" required />
-        <textarea name="steps" placeholder="Vaiheet (erota pilkulla)" rows="5" required />
+        <textarea name="ingredients" placeholder="Ainekset (erota ainekset eri riveille)" rows="5" required />
+        <textarea name="steps" placeholder="Vaiheet (erota vaiheet eri riveille)" rows="5" required />
         
         <div id="add__bottom">
           <label>

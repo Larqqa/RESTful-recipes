@@ -73,8 +73,8 @@ function EditRecipe({user, createRecipeHandler, editable, setEditable, match, ca
 
         <input name="title" value={editable.title || ''} onChange={handleChange} placeholder="Otsikko" required />
         <textarea name="description" value={editable.description || ''} onChange={handleChange} placeholder="Kuvaus" rows="5" required />
-        <textarea name="ingredients" value={editable.ingredients || ''} onChange={handleChange} placeholder="Ainekset (erota pilkulla)" rows="5" required />
-        <textarea name="steps" value={editable.steps || ''} onChange={handleChange} placeholder="Vaiheet (erota pilkulla)" rows="5" required />
+        <textarea name="ingredients" value={editable.ingredients || ''} onChange={handleChange} placeholder="Ainekset (erota ainekset eri riveille)" rows="5" required />
+        <textarea name="steps" value={editable.steps || ''} onChange={handleChange} placeholder="Vaiheet (erota vaiheet eri riveille)" rows="5" required />
         
         <div id="add__bottom">
           <label>

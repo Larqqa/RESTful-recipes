@@ -39,8 +39,8 @@ function Recipe({recipe, dest, user, delRecipe, match, setRecipe, Link, setEdita
       <ol>
         {recipe.steps.map((steps, i) => <li key={i}>{steps}</li>)}
       </ol>
-      <p><b>Annoksia:</b> {recipe.servings} {recipe.servings > 1 ? "lautasellista" : "lautasellinen"}</p>
-      <p><b>Valmistuksen kesto:</b> n. {`${recipe.timeToMake} minuuttia`}</p>
+      {recipe.servings ? <p><b>Annoksia:</b> {recipe.servings} {recipe.servings > 1 ? "lautasellista" : "lautasellinen"}</p> : null}
+      {recipe.timeToMake ? <p><b>Valmistuksen kesto:</b> n. {`${recipe.timeToMake} minuuttia`}</p> : null}
     </div>
   )
 }

@@ -66,6 +66,9 @@ function App() {
     'Kasvis',
     'Marjat ja hedelmät',
     'Vilja ja riisi',
+    'Gluteeniton',
+    'Ruis',
+    'Superfood',
   ]
 
   // Hero image changing fonts
@@ -398,8 +401,8 @@ function App() {
       group: addArrays.group,
       title: e.target.title.value,
       description: e.target.description.value,
-      ingredients: e.target.ingredients.value.includes(',') ? e.target.ingredients.value.split(',') : e.target.ingredients.value,
-      steps: e.target.steps.value.includes(',') ? e.target.steps.value.split(','): e.target.steps.value,
+      ingredients: e.target.ingredients.value.split(/\n/),
+      steps: e.target.steps.value.split(/\n/),
       servings: e.target.servings.value,
       timeToMake: e.target.timeToMake.value,
       userID: user.id,
