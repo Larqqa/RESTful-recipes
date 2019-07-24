@@ -1,8 +1,10 @@
 import React from 'react'
 
 function User({user, handleUserNameChange, handleUserPassChange, delUser}) {
-  if(!user) return <p>Et ole kirjautunut sisään</p>
-  
+  if(!user) {
+    return <p>Et ole kirjautunut sisään</p>
+  }
+
   return (
     <div id="user">
       <h1>Hei {user.username}</h1>
@@ -15,12 +17,12 @@ function User({user, handleUserNameChange, handleUserPassChange, delUser}) {
 
       <form onSubmit={handleUserPassChange}>
         <p><b>Vaihda salasana</b></p>
-        <input placeholder="Vanha salasana" name="oldPass" required />
-        <input placeholder="Uusi salasana" name="newPass" required />
+        <input placeholder="Vanha salasana" name="oldPass" type="password" required />
+        <input placeholder="Uusi salasana" name="newPass" type="password" required />
         <button>Lähetä</button>
       </form>
 
-      <button onClick={delUser}>Poista käyttäjä</button>
+      <button id="del" onClick={delUser}>Poista käyttäjä</button>
     </div>
   )
 }

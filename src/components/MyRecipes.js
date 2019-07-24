@@ -1,8 +1,10 @@
 import React from 'react'
 import Recipe from './subComponents/SingleRecipe'
 
-function MyRecipes({user, recipes, handleOpen, cat, handleChange, group, addArrays, handleGroup}) {
-  if(!user) return <p>Et ole kirjautunut sisään</p>
+function MyRecipes({user, recipes, handleOpen, cat, handleChange, group, addArrays, handleGroup, clearAddArrays}) {
+  if(!user) {
+    return <p>Et ole kirjautunut sisään</p>
+  }
   
   return (
     <div id="myRecipes">
@@ -14,13 +16,14 @@ function MyRecipes({user, recipes, handleOpen, cat, handleChange, group, addArra
         {group.map(opt => {
           const index = addArrays.group.indexOf(opt.toLowerCase())
           if(index >= 0) {
-            return <li key={opt}><label><input type="checkbox" name='recipes' onChange={handleGroup} value={opt.toLowerCase()} checked={true} />{opt}</label></li>
+            return <li key={opt}><input id={opt} type="checkbox" name='recipes' onChange={handleGroup} value={opt.toLowerCase()} checked={true} hidden /><label htmlFor={opt}>{opt}</label></li>
           }
 
-          return <li key={opt}><label><input type="checkbox" name='recipes' onChange={handleGroup} value={opt.toLowerCase()} checked={false} />{opt}</label></li>
+          return <li key={opt}><input id={opt} type="checkbox" name='recipes' onChange={handleGroup} value={opt.toLowerCase()} checked={false} hidden /><label htmlFor={opt}>{opt}</label></li>
         })}
       </ul>
-      {recipes && recipes.length > 0 ? recipes.map((recipe, i) => <Recipe key={i} recipe={recipe} handleOpen={handleOpen} dest={'myRecipes'} />) : <p>Ei vielä omia reseptejä</p>}
+      <hr />
+      {recipes && recipes.length > 0 ? recipes.map((recipe, i) => <><Recipe key={i} recipe={recipe} handleOpen={handleOpen} dest={'myRecipes'} clearAddArrays={clearAddArrays} />{i !== recipes.length - 1 ? <hr /> : null}</>) : <p>Reseptejä ei löytynyt</p>}
     </div>
   )
 }

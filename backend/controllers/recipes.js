@@ -98,7 +98,7 @@ recipesRouter.post('/:loginKEY', async (req, res, next) => {
       res.json(saved.toJSON())
     } else {
       next(new Error('No user by that ID or not logged in'))
-      res.status(404).send('Käyttäjää ei löytynyt, tai ei sisäänkirjautumista').end()
+      res.status(404).send('Käyttäjää ei löytynyt, tai et ole kirjautunut sisään').end()
     }
 
   } catch(exception) {
@@ -116,7 +116,7 @@ recipesRouter.delete('/:id&:userID&:loginKEY', async (req, res, next) => {
       res.status(204).end()
     } else {
       next(new Error('No user by that ID or not logged in'))
-      res.status(404).send('Käyttäjää ei löytynyt, tai ei sisäänkirjautumista').end()
+      res.status(404).send('Käyttäjää ei löytynyt, tai et ole kirjautunut sisään').end()
     }
   } catch (exception) {
     //next(exception)
@@ -154,7 +154,7 @@ recipesRouter.put('/:id&:userID&:loginKEY', async (req, res, next) => {
       }
     } else {
       next(new Error('No user by that ID or not logged in'))
-      res.status(404).send('Käyttäjää ei löytynyt, tai ei sisäänkirjautumista').end()      
+      res.status(404).send('Käyttäjää ei löytynyt, tai et ole kirjautunut sisään').end()      
     }
   } catch (exception) {
     //next(exception)

@@ -1,21 +1,614 @@
-@import url('https://fonts.googleapis.com/css?family=Bangers|Creepster|Ewert|Fascinate|Faster+One|Metal+Mania|Monoton|Oleo+Script+Swash+Caps|Pacifico|Patua+One|Permanent+Marker|Piedra|Press+Start+2P|Ranchers|Trade+Winds&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+@font-face {
+  font-family: Pacifico;
+  src: url('./utils/pacifico/Pacifico-Regular.ttf');
+}
 
+@import url('https://fonts.googleapis.com/css?family=Creepster|Fascinate|Metal+Mania|Oleo+Script+Swash+Caps|Patua+One|Permanent+Marker|Piedra|Trade+Winds|Poppins&display=swap');
 
-a, li, p, button, span, b, input, textarea, option, select {
-  font-family: 'Montserrat', sans-serif;
+/* VARIABLES */
+$colors: (
+  bg: (
+    base: rgba(56, 173, 169,1.0),
+    light: lighten(rgba(56, 173, 169,1.0), 52%),
+    ultraLight: lighten(rgba(56, 173, 169,1.0), 54%),
+  ),
+  font: (
+    base: rgba(10, 61, 98,1.0),
+    dark: rgba(10, 61, 98,0.5),
+    light: rgba(239,248,255,1.0),
+  ),
+  message: (
+    base: rgba(120, 224, 143,1.0),
+    error: rgba(229, 80, 57,1.0),
+    alert: rgba(246, 185, 59,1.0),
+  ),
+);
+
+// Function to get colors
+@function color($color, $tone: 'base') {
+  @return map-get(map-get($colors, $color), $tone);
+}
+
+$paddings: (
+  base: 1rem,
+  small: .5rem,
+  link: .5rem 0,
+  big: 2rem,
+);
+
+// Function to get padding
+@function padding($pad: 'base') {
+  @return map-get($paddings, $pad);
+}
+
+$transitionSpeed: (
+  base: .1s,
+  fast: .05s,
+  mid: .2s,
+  slow: .3s,
+);
+
+// Function to get speed
+@function speed($speed: 'base') {
+  @return map-get($transitionSpeed, $speed);
+}
+
+/* FONTS */
+$paragraph: 'Poppins', sans-serif;
+$heading: 'Pacifico', sans-serif;
+
+/* MIXINS */
+@mixin text {
+  font-family: $paragraph;
   font-size: 1rem;
+  margin: 0;
+}
+
+@mixin button {
+  @include centerContent;
+  position: relative;
+  background: color(bg, light);
+  color: color(font);
+  font-weight: bold;
+  padding: padding();
+  outline: none;
+  border: 1px solid color(bg);
+  border-radius: 2px;
+  transition: background speed(), color speed();
+}
+
+@mixin div {
+  position: relative;
+  z-index: 1;
+  padding: padding();
+}
+
+@mixin centerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* KEYFRAMES */
+@keyframes dots {
+  0%   {content: ""}
+  25%   {content: "."}
+  50%   {content: ".."}
+  75%   {content: "..."}
+}
+
+/* NORMALIZE */
+html {
+  color: color(font);
+}
+
+div, span, b, a, li, p {
+  @include text;
+  color: color(font, light);
+}
+
+button, input, textarea, option, select {
+  @include text;
+  color: color(font);
+}
+
+h1 {
+  font-family: $heading;
+  margin: padding(big) 0
 }
 
 a {
-  //color: white;
   text-decoration: none;
+}
+
+ul, ol {
+  padding: 0 0 padding() 0;
+  margin: 0;
 }
 
 ul {
   list-style-type: none;
-  padding: 0;
+}
+
+ol {
+  padding-left: padding();
+}
+
+button {
+  @include button;
+  width: 100%;
+  cursor: pointer;
+  &:hover {
+    background: color(bg);
+    color: color(font, light);
+    z-index: 3;
+  }
+}
+
+select {
+  @include button;
+  width: 100%;
+  cursor: pointer;
+  option:checked {
+    background: color(bg);
+    color: color(bg, light);
+  }
+}
+
+label {
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked+label {
+  color: color(bg);
+  font-weight: bold;
+} 
+
+input {
+  box-sizing : border-box;
+  
+  &:not([type='checkbox']) {
+    @include button;
+    font-weight: normal;
+    width: 100%;
+    box-sizing : border-box;
+    margin: padding(small) 0;
+    &::placeholder {
+      color: color(font, dark);
+    }
+  }
+}
+
+textarea {
+  @include button;
+  font-weight: normal;
+  width: 100%;
+  box-sizing : border-box;
+  margin: padding(small) 0;
+  resize: vertical;
+  &::placeholder {
+    color: color(font, dark);
+  }
+}
+
+input:not([type='checkbox']), textarea {
+  background: color(bg, ultraLight);
+}
+
+/* UTILITY */ 
+#loader {
+  @include centerContent;
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  min-height: 100vh;
+  min-width: 100vw;
+  background: radial-gradient(color(bg) 10%, darken(color(bg), 10%) 60%);
+
+  h1 {
+    font-size: 3rem;
+    color: color(font, light);
+    &::after{
+      content: '';
+      animation: dots 2s infinite;
+    }
+  }
+}
+
+#error {
+  @include centerContent;
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+  top: -100px;
+  background: color(message);
+  p {
+    padding: padding();
+    color: color(font, light);
+    font-weight: bold;
+  }
+  &.success {
+    background: color(message);
+  }
+  &.error {
+    background: color(message, error);
+  }
+  &.alert {
+    background: color(message, alert);
+  }
+}
+
+/* MAIN */
+#root {
+  background-image: url('./utils/bg.jpg');
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: right;
+  background-repeat: no-repeat;
+  
+  #bg--overlay {
+    z-index: 0;
+    position: fixed;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-image: radial-gradient(rgba(0,0,0,0.3) 10%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,.9) 90%)
+  }
+}
+
+#main {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 100vh;
+}
+
+#hamburger {
+  position: relative;
+  background: color(bg);
+  color: color(font, light);
+  width: 100%;
+  z-index: 20;
+  box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.3), 0px 0px 2px 1px rgba(0,0,0,0.5);
+
+  &.active {
+    background: color(bg, light);
+    color: color(bg);
+  }
+  
+}
+
+#nav {
+  width: 100%;
+  z-index: 2;
+  top: -150px;
+  position: absolute;
+  opacity: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: transparent;
+  pointer-events: none;
+  transition: background speed();
+  box-shadow: 0px 0px 5px 3px rgba(0,0,0,0.3), 0px 0px 2px 1px rgba(0,0,0,0.5);
+
+  &.show {
+    opacity: 1 !important;
+    background: color(bg);
+    pointer-events: all;
+  }
+  div {
+    @include centerContent;
+    width: 100%;
+    justify-content: flex-start;
+    padding: padding();
+  }
+  a {
+    padding: padding();
+    width: 100%;
+    transition: color speed(), background speed();
+    &:hover {
+      background: color(bg,light);
+      color: color(font);
+      z-index: 3;
+    }
+  }
+  p {
+    padding: padding();
+    width: 100%;
+    font-size: 1.4rem;
+    font-family: $heading;
+  }
+}
+
+#hero, #recipes, #recipe, #myRecipes, #editRecipe, #addRecipe, #user, #loginForm, #registerForm, footer {
+  @include div;
+}
+
+#recipes, #myRecipes, #addRecipe, #user, #loginForm, #registerForm {
+  padding-top: 0;
+}
+
+#hero {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  .hero__nav {
+    @include centerContent;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    button {
+      width: 50%;
+      &.noUser {
+        width: 100%;
+      }
+    }
+  }
+
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+
+    h1 {
+      width: 100%;
+      margin: padding() 0;
+      word-wrap: break-word;
+      text-align: center;
+      font-size: 4.5rem;
+    }
+    
+    p {
+      margin: padding() 0;
+    }
+  }
+}
+
+#recipes, #myRecipes {
+  hr {
+    margin: padding() 0;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0;
+    padding: padding() 0;
+
+    li {
+      padding: padding(small) padding();
+    }
+  }
+
+  div {
+    padding: padding() 0;
+    &:last-child {
+      padding-bottom: 0;
+    }
+    
+    h3, p {
+      margin-bottom: padding();
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 2rem;
+      font-family: $heading;
+    }
+  }
+}
+
+#loginForm, #registerForm {
+  @include centerContent;
+  flex-grow: 1;
+  align-items: normal;
+}
+
+#user {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  form {
+    padding: 0 0 padding(big) 0;
+    p {
+      padding-bottom: padding();
+    }
+  }
+  #del {
+    margin-top: auto;
+  }
+}
+
+#addRecipe, #editRecipe {
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0;
+    padding: padding() 0;
+
+    li {
+      padding: padding(small) padding();
+    }
+  }
+}
+
+#recipe {
+  p, ul, ol {
+    padding-bottom: padding();
+  }
+
+  p:last-child {
+    padding-bottom: 0;
+  }
+
   li {
-    padding-left: 1rem;
+    padding-bottom: padding(small);
+  }
+}
+
+footer {
+  display: flex;
+  p, a, span {
+    font-size: .8rem;
+  }
+  
+  p, a {
+    padding-right: padding();
+  }
+
+  a {
+    transition: color speed();
+
+    &:hover {
+      color: lighten(color(font), 50%)
+    }
+  }
+}
+
+
+/* MEDIA */
+@media screen and (min-width: 1000px) {
+  button, select {
+    max-width: 200px;
+    width: 100%;
+    max-height: 53px;
+  }
+
+  #hamburger {
+    display: none;
+  }
+  
+  #nav {
+    top: 0 !important;
+    opacity: 1 !important;
+    position: relative;
+    pointer-events: all;
+    background: color(bg);
+    
+    div {
+      padding: 0;
+      flex-direction: row;
+      width: initial;
+    }
+    
+    #nav__sub {
+      flex-grow: 1;
+      justify-content: flex-end;
+      
+      a, p {
+        width: initial;
+      }
+
+      p {
+        padding: 0 padding();
+      }
+    }
+  }
+
+  #hero, #recipes, #recipe, #myRecipes, #editRecipe, #addRecipe, #user, #loginForm, #registerForm {
+    max-width: 80%;
+    width: 100%;
+    margin: auto;
+  }
+
+  .hero__buttons button {
+    margin: auto;
+  }
+
+  .recipe__nav {
+    @include centerContent;
+    flex-direction: row;
+    justify-content: flex-start;
+    
+    a {
+      width: 100%;
+      max-width: 200px;
+    }
+    
+    button {
+      margin: 0;
+    }
+  }
+
+  #add__bottom {
+    @include centerContent;
+    padding: padding() 0;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  #loginForm, #registerForm {
+    form {
+      @include centerContent;
+      margin: auto;
+      width: 30%;
+      
+      button {
+        max-width: 100%;
+        margin-top: padding(small)
+      }
+    }
+  }
+
+  #user {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    
+    h1 {
+      margin-top: auto;
+      width: 100%;
+    }
+
+    form {
+      width: 50%;
+      box-sizing: border-box;
+      padding-left: padding();
+ 
+      &:first-of-type {
+        padding-left: 0;
+        padding-right: padding();
+      }
+
+      input {
+        max-width: 400px;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  #hero, #recipes, #recipe, #myRecipes, #editRecipe, #addRecipe, #user, #loginForm, #registerForm {
+    max-width: 60%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .recipe__nav {
+    @include centerContent;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    a {
+      width: 50%;
+      button {
+        width: 100%;
+      }
+    }
+
+    button {
+      width: 50%
+    }
+
+    #back {
+      width: 100%;
+    }
   }
 }

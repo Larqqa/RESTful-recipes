@@ -18,15 +18,17 @@ function Recipe({recipe, dest, user, delRecipe, match, setRecipe, Link, setEdita
 
   return (
     <div id="recipe">
-      {dest !== '/' && dest ? <Link to={`/${dest}`}><button>Takaisin</button></Link> : <Link to='/' ><button>Etusivulle</button></Link>}
-      {user && user.id === recipe.userID ?
-        <>
-        <Link to={`/editRecipe/${recipe.id}`} ><button>Muokkaa</button></Link>
-        <button onClick={delRecipe} value={`${recipe.id}`}>Poista</button>
-        </>
-      : false}
-      <h3>{recipe.title}</h3>
-      <p>{recipe.group.map((group, i) => i === 0 && group ? `- ${group}  - ` : `${group}  - `)}</p>
+      <div className="recipe__nav">
+        <Link to={dest !== '/' && dest ? `/${dest}` : '/'} id="back"><button>{dest !== '/' && dest ? 'Takaisin' : 'Etusivulle'}</button></Link>
+        {user && user.id === recipe.userID ?
+            <>
+            <Link to={`/editRecipe/${recipe.id}`} ><button>Muokkaa</button></Link>
+            <button onClick={delRecipe} value={`${recipe.id}`}>Poista</button>
+            </>
+        : false}
+      </div>
+      <h1>{recipe.title}</h1>
+      {recipe.group.length > 0 ? <p>{recipe.group.map((group, i) => i === 0 && group ? `- ${group}  - ` : `${group}  - `)}</p> : null}
       <p>- {recipe.category} -</p>
       <p>{recipe.description}</p>
       <p><b>Ainekset:</b></p>

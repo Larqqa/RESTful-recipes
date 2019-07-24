@@ -13,15 +13,18 @@ const HeroRecipe = ({recipe, font, handleOpen, handleChange, cat, changeFilter, 
         </div>
         {recipe ?
           <>
-          <h1 style={{fontFamily: font, fontSize: `${recipe.title && recipe.title.length < 10 ? 12 : 8 }rem`}} >{recipe.title}</h1>
-          <p>{recipe.description}</p>
+          <div className="hero__content">
+            <h1 style={{fontFamily: font}} >{recipe.title}</h1>
+            <p>{recipe.description}</p>
+          </div>
           <div className="hero__buttons">
             <button value={`${recipe.id}:/`} onClick={handleOpen}>Avaa</button>
-            <button onClick={handleChange}>Vaihda</button>
           </div>
           </>
           :
-          <h1>Ei reseptejä</h1>
+          <div className="hero__content">
+            <h1>Ei reseptejä</h1>
+          </div>
         }
     </div>
   )

@@ -1,26 +1,26 @@
 import React from 'react'
 
-function Navigation({Link, handleLogout, user, clearEdit}) {
+function Navigation({Link, handleLogout, user, clearEdit, hamburgerClick, clearAddArrays}) {
   return (
     <div id="nav">
       <div id="nav__main">
-        <Link to='/'>Etusivu</Link>
-        <Link to='/Recipes'>Reseptejä</Link>
+        <Link to='/' onClick={hamburgerClick} >Etusivu</Link>
+        <Link to='/Recipes' onClick={(e)=>{clearAddArrays(e); hamburgerClick(e)}} >Reseptejä</Link>
       </div>
       <div id="nav__sub">
         {user ?
           <>
           <p>Hei {user.username}</p>
-          <Link to='/AddRecipe' onClick={clearEdit}>Lisää resepti</Link>
-          <Link to='/User'>Käyttäjätili</Link>
-          <Link to='/MyRecipes'>Minun reseptit</Link>
-          <Link onClick={handleLogout} to='/'>Kirjaudu ulos</Link>
+          <Link to='/AddRecipe' onClick={(e)=>{clearAddArrays(e); hamburgerClick(e)}} >Lisää resepti</Link>
+          <Link to='/User' onClick={hamburgerClick} >Käyttäjätili</Link>
+          <Link to='/MyRecipes' onClick={(e)=>{clearAddArrays(e); hamburgerClick(e)}} >Minun reseptit</Link>
+          <Link onClick={(e)=>{handleLogout(e); hamburgerClick(e)}} to='/' >Kirjaudu ulos</Link>
           
           </>
           :
           <>
-          <Link to='/Login'>Kirjaudu sisään</Link>
-          <Link to='/Register'>Rekisteröidy</Link>
+          <Link to='/Login' onClick={hamburgerClick} >Kirjaudu sisään</Link>
+          <Link to='/Register' onClick={hamburgerClick} >Rekisteröidy</Link>
           </>
         }
       </div>

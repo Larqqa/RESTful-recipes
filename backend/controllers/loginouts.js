@@ -42,7 +42,7 @@ loginoutRouter.post('/auth/:username&:password&:loginKEY', async (req, res, next
   try { 
     const userArr = await User.find({username: req.params.username})
     const user = userArr[0]
-    if(!user.username || !user.loginKEY) return res.status(404).send('Väärä käyttäjänimi, tai ei sisäänkirjautumista').end()
+    if(!user.username || !user.loginKEY) return res.status(404).send('Väärä käyttäjänimi, tai et ole kirjautunut sisään').end()
 
     Hash.verify(req.params.password, user.password,
       (verify) => {

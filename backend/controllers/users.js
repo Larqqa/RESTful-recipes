@@ -41,7 +41,7 @@ usersRouter.post('/', (req, res, next) => {
         res.json(saved.toJSON())
       } catch(exception) {
         //next(exception)
-        if(exception.errors.username.kind === 'minlength') return res.status(400).send(`Käyttäjänimi ${body.username} on liian lyhyt`).end()
+        if(exception.errors.username.kind === 'minlength') return res.status(400).send(`Käyttäjänimi ${body.username} on liian lyhyt (4)`).end()
         res.status(400).send(`Käyttäjänimi ${body.username} on jo käytössä`).end()
       }
     }
@@ -79,7 +79,7 @@ usersRouter.put('/:username&:password&:loginKEY', async (req, res, next) => {
   try {
     const userArr = await User.find({username: req.params.username})
     const user = userArr[0]
-    if(!user || !user.loginKEY) return res.status(404).send('Väärä käyttäjänimi, tai ei sisäänkirjautumista').end()
+    if(!user || !user.loginKEY) return res.status(404).send('Väärä käyttäjänimi, tai et ole kirjautunut sisään').end()
     const body = req.body
 
     // If no password, no need to verify user
@@ -94,13 +94,13 @@ usersRouter.put('/:username&:password&:loginKEY', async (req, res, next) => {
       })
       
       try{
-        const newUser = await User.findByIdAndUpdate(user.id, userChange, { new: true, select: 'username email id  loginKEY' })
+        const newUser = await User.findByIdAndUpdate(user.id, userChange, {context: 'query', runValidators: true, new: true, select: 'username email id  loginKEY' })
         res.json(newUser.toJSON())
         return res.status(204).end()
       } catch (exception) {
-        //next(exception)
-        if(exception.errors.username.kind === 'minlength') return res.status(400).send(`Käyttäjänimi ${body.username} on liian lyhyt`).end()
-        res.status(400).send(`Käyttäjänimi ${body.username} on jo käytössä`).end()
+        if(exception.errors.username.kind === 'minlength') return res.status(400).send(`Käyttäjänimi on liian lyhyt (minimi: 4)`).end()
+        if(exception.errors.username.kind === 'unique') return res.status(400).send(`Käyttäjänimi ${body.username} on jo käytössä`).end()
+        next(exception)
       }
     }
 

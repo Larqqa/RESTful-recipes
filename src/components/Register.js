@@ -2,9 +2,9 @@ import React from 'react'
 
 function Register({registerHandler}) {
   return (
-    <div id="registrationForm">
+    <div id="registerForm">
       <form onSubmit={registerHandler}>
-        <h3>Rekisteröidy</h3>
+        <h1>Rekisteröidy</h1>
         <input name="name" placeholder="Käyttäjänimi" required />
         <input name="pass" placeholder="Salasana" type="password" required />
         <button>Rekisteröidy</button>

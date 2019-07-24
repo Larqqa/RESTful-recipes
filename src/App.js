@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 import {Redirect} from 'react-router'
+import Anime from 'animejs'
 import './App.scss'
 
 /* SERVICES */
@@ -21,6 +22,10 @@ import User from './components/User'
 import AddRecipe from './components/AddRecipe'
 import EditRecipe from './components/EditRecipe'
 import HeroRecipe from './components/HeroRecipe'
+import Footer from './components/Footer'
+
+/* SUB-COMPONENTS */
+import ScrollToTop from './components/subComponents/ScrollToTop'
 
 /* APP */
 function App() {
@@ -33,7 +38,7 @@ function App() {
   const [userRecipes, setUserRecipes] = useState()
   const [error, setError] = useState('')
   const [dest, setDest] = useState()
-  const [font, setFont] = useState("'Bangers', cursive")
+  const [font, setFont] = useState("'Creepster', cursive")
   const [redirect, setRedirect] = useState()
   const [filter, setFilter] = useState(['rand','kaikki'])
   const [addArrays, setAddArrays] = useState({group:[], ingredients:[], steps:[]})
@@ -42,8 +47,7 @@ function App() {
   const cat = [
     'Kaikki',
     'Aamupala',
-    'Lounas',
-    'Päivällinen',
+    'Pääruoka',
     'Välipala',
     'Iltapala',
     'Jälkiruoka'
@@ -52,22 +56,20 @@ function App() {
   // Pre-set groups
   const group = [
     'Kana ja linnut',
-    'Punainenliha',
-    'Kasvis',
+    'Punainen liha',
     'Kala ja äyriäiset',
+    'Maitotuotteet',
     'Maidoton',
+    'Kananmuna',
     'Kananmunaton',
+    'Kasvis',
     'Marjat ja hedelmät',
     'Vilja ja riisi',
-    'Maitotuotteet',
-    'Kananmuna'
   ]
 
   // Hero image changing fonts
   const fonts = [
-    "'Bangers', cursive",
     "'Creepster', cursive",
-    "'Ewert', cursive",
     "'Fascinate', cursive",
     "'Metal Mania', cursive",
     "'Oleo Script Swash Caps', cursive",
@@ -75,28 +77,30 @@ function App() {
     "'Patua One', cursive",
     "'Permanent Marker', cursive",
     "'Piedra', cursive",
-    "'Ranchers', cursive",
     "'Trade Winds', cursive"
   ]
 
-  // After page load, hide loader
-  const handleLoad = () => {
-    let opacity = 1;
-    const loader = document.getElementById('loader')
-
-    const refreshIntervalId = setInterval(() => {
-      if(opacity <= 0) {
-        clearInterval(refreshIntervalId)
-        loader.remove()
-      }
-      opacity -= .05
-      loader.style.opacity = opacity
-    }, 10)
-  }
-  
   // On init get recipes and check if user is logged in
   useEffect(() => {
-    window.addEventListener('load', handleLoad)
+
+    // On load hide loader
+    window.addEventListener('load', () => {
+
+      // Animate loader, after animation remove from DOM
+      const loader = document.getElementById('loader')
+
+      Anime({
+        targets: loader,
+        opacity: 0,
+        duration: 2000,
+        begin: () => loader.style.pointerEvents = 'none',
+        complete: () => {
+          loader.remove()
+        }
+      })
+      
+      console.log('Page fully loaded')
+    })
     
     const user = loginSessions.checkLogin()
 
@@ -108,7 +112,10 @@ function App() {
       .then(recipes => {
         setUserRecipes(recipes)
       })
-      .catch(error => setError(error.toString()))
+      .catch(error => {
+        const message = error.response
+        errorMessage(message.data, 'error')
+      })
     }
 
     // Get all recipes
@@ -118,10 +125,16 @@ function App() {
       setRecipes(recipes)
 
       // Get random recipe for hero
-      const rand = Math.floor(Math.random() * (recipes.length))
-      setHeroRecipe(recipes[rand])
+      setHeroRecipe(
+        recipes[
+          Math.floor(Math.random() * (recipes.length))
+        ]
+      )
     })
-    .catch(error => setError(error.toString()))
+    .catch(error => {
+      const message = error.response
+      errorMessage(message.data, 'error')
+    })
   }, [])
 
   /* ------------USER------------ */
@@ -139,11 +152,15 @@ function App() {
         setUser(user)
         setUserRecipes(recipes)
         loginSessions.saveLogin(user)
+        errorMessage(`Tervetuloa takaisin ${user.username} 🖐`, 'success')
         setRedirect()
         setRedirect('/')
       })
     })
-    .catch(error => setError(error.toString()))
+    .catch(error => {
+      const message = error.response
+      errorMessage(message.data, 'error')
+    })
   }
 
   // Handle registering
@@ -161,10 +178,11 @@ function App() {
       loginSessions.saveLogin(user)
       setRedirect()
       setRedirect('/')
+      errorMessage(`Tervetuloa ${user.username} 🤝`, 'success')
     })
     .catch(error => {
       const message = error.response
-      console.log(`${message.status} : ${message.statusText} | ${message.data}`)
+      errorMessage(message.data, 'alert')
     })
   }
 
@@ -181,11 +199,14 @@ function App() {
       setUserRecipes('')
       setRedirect()
       setRedirect('/')
+      errorMessage(`Nähdään taas 👋`, 'success')
     })
-    .catch(error => setError(error.toString()))
+    .catch(error => {
+      errorMessage('Jokin meni pieleen 🤔', 'error')
+    })
   }
 
-  // Handle changing user credentials
+  // Handle changing username
   const handleUserNameChange = (e) => {
     e.preventDefault()
 
@@ -198,8 +219,16 @@ function App() {
     .edit(user.username, '', user.loginKEY, obj)
     .then(res => {
       setUser(res)
+      loginSessions.saveLogin(res)
+      errorMessage(`Käyttäjänimi vaihdettu ${res.username}ksi 👌`, 'success')
+    })
+    .catch(error => {
+      const message = error.response
+      errorMessage(message.data, 'error')
     })
   }
+
+  // Handle changing password
   const handleUserPassChange = (e) => {
     e.preventDefault()
 
@@ -211,6 +240,12 @@ function App() {
     .edit(user.username, e.target.oldPass.value, user.loginKEY, obj)
     .then(res => {
       setUser(res)
+      loginSessions.saveLogin(res)
+      errorMessage(`Salasana vaihdettu 👌`, 'success')
+    })
+    .catch(error => {
+      const message = error.response
+      errorMessage(message.data, 'error')
     })
   }
 
@@ -219,16 +254,20 @@ function App() {
     e.preventDefault()
 
     // Prompt requires users password to allow for deletion
-    const pass = window.prompt("Oletko varma että haluat poistaa käyttäjätilisi? Anna salasana ja paina ok.")
+    const pass = window.prompt("Oletko varma, että haluat poistaa käyttäjätilisi? Anna salasana ja paina ok.")
     if (!pass) return
     userService
     .del(user.username, pass, user.loginKEY)
     .then(() => {
       setUser()
       loginSessions.clearLogin()
-      console.log('Käyttäjä poistettu, hei hei :(')
+      errorMessage('Käyttäjätilisi on poistettu ☠️', 'alert')
       setRedirect()
       setRedirect('/')
+    })
+    .catch(error => {
+      const message = error.response
+      errorMessage(message.data, 'error')
     })
   }
 
@@ -293,23 +332,37 @@ function App() {
         const rand = Math.floor(Math.random() * (allRecipes.length))
         setFont(fonts[Math.floor(Math.random() * fonts.length)])
         setHeroRecipe(allRecipes[rand])
-      })   
+      })
+      .catch(error => {
+        const message = error.response
+        errorMessage(message.data, 'error')
+      })
     } else {
       // If filtering is done through the checkboxes, the filtering happens server side.
       // Filter array is compared with recipe group array and returned if all match
 
       // Gets recipes with user id
-      recipesService
-      .getAllByGroups(addArrays.group, user.id)
-      .then(recipes => {
-        setUserRecipes(recipes)
-      })
-
+      if(user) {
+        recipesService
+        .getAllByGroups(addArrays.group, user.id)
+        .then(recipes => {
+          setUserRecipes(recipes)
+        })
+        .catch(error => {
+          const message = error.response
+          errorMessage(message.data, 'error')
+        })
+      }
+      
       // Gets all recipes
       recipesService
       .getAllByGroups(addArrays.group)
       .then(recipes => {
         setRecipes(recipes)
+      })
+      .catch(error => {
+        const message = error.response
+        errorMessage(message.data, 'error')
       })
     }
   }
@@ -328,7 +381,10 @@ function App() {
       setRedirect()
       setRedirect(`/recipe/${recipe.title.replace(' ', '_')}`)
     })
-    .catch(error => setError(error.toString()))
+    .catch(error => {
+      const message = error.response
+      errorMessage(message.data, 'error')
+    })
   }
 
   // Handle creating and editing recipes
@@ -368,10 +424,20 @@ function App() {
         .then(recipes => {
           setUserRecipes(recipes)
         })
+
+        // Reset groups
+        const arr = addArrays
+        arr.group = []
+        setAddArrays({...arr})
+
+        errorMessage(`Reseptiä ${res.title} muokattu 👌`, 'success')
         setRedirect()
         setRedirect(`/recipe/${res.title.replace(' ', '_')}`)
       })
-      .catch(error => setError(error.toString()))
+      .catch(error => {
+        const message = error.response
+        errorMessage(message.data, 'error')
+      })
     } else {
       // If target has no id, create new recipe
       // Send new recipe, update states for users recipes and all recipes, and redirect to users recipes page
@@ -390,11 +456,21 @@ function App() {
         .then(recipes => {
           setUserRecipes(recipes)
         })
+
+        // Reset groups
+        const arr = addArrays
+        arr.group = []
+        setAddArrays({...arr})
+
+        errorMessage(`Resepti ${res.title} lisätty 👌`, 'success')
         setDest('myRecipes')
         setRedirect()
         setRedirect(`/recipe/${res.title.replace(' ', '_')}`)
       })
-      .catch(error => setError(error.toString()))
+      .catch(error => {
+        const message = error.response
+        errorMessage(message.data, 'error')
+      })
     }
   }
 
@@ -403,7 +479,7 @@ function App() {
     e.preventDefault()
 
     // Confirmation window checks if user is sure they want to delete the recipe
-    if(window.confirm("Oletko varma että haluat poistaa tämän reseptin?")) {
+    if(window.confirm("Oletko varma, että haluat poistaa tämän reseptin?")) {
       recipesService
       .del(e.target.value, user.id, user.loginKEY)
       .then(() => {
@@ -418,12 +494,15 @@ function App() {
         .then(recipes => {
           // Update user recipes and redicect
           setUserRecipes(recipes)
-          setError('Resepti poistettu')
+          errorMessage('Resepti poistettu 👌', 'success')
           setRedirect()
           setRedirect('/myRecipes')
         })
       })
-      .catch(error => setError(error.toString()))
+      .catch(error => {
+        const message = error.response
+        errorMessage(message.data, 'error')
+      })
     } else {
       return
     }
@@ -490,18 +569,41 @@ function App() {
   
   // Handle hamburger navigation
   const hamburgerClick = (e) => {
-    e.preventDefault()
-
     const nav = document.getElementById('nav')
     const burger = document.getElementById('hamburger')
+    
+    Anime({
+      targets: nav,
+      top: burger.clientHeight,
+      duration: 600,
+      begin: () => {
+        nav.style.top = -nav.clientHeight
+        nav.style.opacity = 1
+      }
+    })
 
+    let hide = null
     // If burger is active, make it not active :D
     if(burger.classList.contains('active')) {
       nav.classList.remove('show')
       burger.classList.remove('active')
+
+      hide = Anime({
+        targets: nav,
+        opacity: 0,
+        top: -nav.clientHeight,
+        duration: 600,
+        complete: () => {
+          nav.style.opacity = 0
+        }
+      })
     } else {
       nav.classList.add('show')
       burger.classList.add('active')
+      if(hide) {
+        hide.reset()
+        hide.stop()
+      }
     }
   }
 
@@ -511,152 +613,201 @@ function App() {
   }
 
   // Error handling
-  const err = () => {
+  const errorMessage = (errorMsg, status) => {
+    const error = document.getElementById('error')
+
+    // Message box animation
+    const message = Anime({
+      targets: error,
+      top: 0,
+      duration: 600,
+      begin: () => {
+        error.className = ''
+        error.classList.add(status)
+        setError(errorMsg)
+      },
+      complete: () => {
+        Anime({
+          targets: error,
+          top: -100,
+          delay: 1000,
+          duration: 300,
+        })
+      }
+    })
+
+    // Everytime a new message fires animation callback complete is delayed
+    message.reset()
+    message.play()
+  }
+
+  const clearAddArrays = (e) => {
     
+    // Clear group state
+    const arr = addArrays
+    arr.group = []
+    setAddArrays(arr)
+
+    // Reset recipe states
+    handleChange()
   }
 
   /* ------------UTILITY END------------ */
 
   return (
     <Router>
-      <div id="error">{error}</div>
-      <div id="loader"><h1>Ladataan</h1></div>
-      {redirect ? <Redirect to={redirect} /> : false}
-      <div id="main">
-        <div className="bg--overlay"></div>
-        <button id="hamburger" onClick={hamburgerClick}><i className="fas fa-bars" /></button>
-        <Navigation Link={Link} user={user} handleLogout={handleLogout} clearEdit={clearEdit} />
-        
-        <Route exact path='/'
-          render={(routeProps) => (
-            <HeroRecipe
-            {...routeProps}
-            {...{
-              font: font,
-              recipe: heroRecipe,
-              handleOpen: handleOpen,
-              handleChange: handleChange,
-              cat: cat,
-              changeFilter: changeFilter,
-              user: user
-            }} />
-          )}
-        />
+      <ScrollToTop>
+        <div id="error"><p>{error}</p></div>
+        <div id="loader"><h1>Ladataan</h1></div>
+        {redirect ? <Redirect to={redirect} /> : false}
+        <div id="bg--overlay"></div>
+        <div id="main">
+          <button id="hamburger" onClick={hamburgerClick}><i className="fas fa-utensils" /></button>
+          <Navigation
+            Link={Link}
+            user={user}
+            handleLogout={handleLogout}
+            clearEdit={clearEdit}
+            hamburgerClick={hamburgerClick}
+            clearAddArrays={clearAddArrays}
+          />
+          
+          <Route exact path='/'
+            render={(routeProps) => (
+              <HeroRecipe
+              {...routeProps}
+              {...{
+                font: font,
+                recipe: heroRecipe,
+                handleOpen: handleOpen,
+                handleChange: handleChange,
+                cat: cat,
+                changeFilter: changeFilter,
+                user: user
+              }} />
+            )}
+          />
 
-        <Route path='/login'
-          render={(routeProps) => (
-            <Login
-            {...routeProps}
-            {...{
-              loginHandler: loginHandler
-            }} />
-          )}
-        />
+          <Route path='/login'
+            render={(routeProps) => (
+              <Login
+              {...routeProps}
+              {...{
+                loginHandler: loginHandler
+              }} />
+            )}
+          />
 
-        <Route path='/register'
-          render={(routeProps) => (
-            <Register
-            {...routeProps}
-            {...{
-              registerHandler: registerHandler
-            }} />
-          )}
-        />
+          <Route path='/register'
+            render={(routeProps) => (
+              <Register
+              {...routeProps}
+              {...{
+                registerHandler: registerHandler
+              }} />
+            )}
+          />
 
-        <Route path='/user'
-          render={(routeProps) => (
-            <User
-            {...routeProps}
-            {...{
-              user: user,
-              handleUserNameChange: handleUserNameChange,
-              handleUserPassChange: handleUserPassChange,
-              delUser: delUser
-            }} />
-          )}
-        />
+          <Route path='/recipe/:id'
+            render={(routeProps) => (
+              <Recipe
+              {...routeProps}
+              {...{
+                recipe: recipe,
+                dest: dest,
+                setEditable: setEditable,
+                user: user,
+                delRecipe: delRecipe,
+                setRecipe: setRecipe,
+                Link: Link
+              }} />
+            )}
+          />
 
-        <Route path='/recipe/:id'
-          render={(routeProps) => (
-            <Recipe
-            {...routeProps}
-            {...{
-              recipe: recipe,
-              dest: dest,
-              setEditable: setEditable,
-              user: user,
-              delRecipe: delRecipe,
-              setRecipe: setRecipe,
-              Link: Link
-            }} />
-          )}
-        />
+          <Route path='/recipes'
+            render={(routeProps) => (
+              <Recipes
+              {...routeProps}
+              {...{
+                recipes: recipes,
+                handleOpen: handleOpen,
+                cat: cat,
+                handleChange: handleChange,
+                group: group,
+                addArrays: addArrays,
+                handleGroup: handleGroup,
+                clearAddArrays: clearAddArrays
+              }} />
+            )}
+          />
 
-        <Route path='/recipes'
-          render={(routeProps) => (
-            <Recipes
-            {...routeProps}
-            {...{
-              recipes: recipes,
-              handleOpen: handleOpen,
-              cat: cat,
-              handleChange: handleChange,
-              group: group,
-              addArrays: addArrays,
-              handleGroup: handleGroup
-            }} />
-          )}
-        />
+          <Route path='/user'
+            render={(routeProps) => (
+              <User
+              {...routeProps}
+              {...{
+                user: user,
+                handleUserNameChange: handleUserNameChange,
+                handleUserPassChange: handleUserPassChange,
+                delUser: delUser,
+              }} />
+            )}
+          />
 
-        <Route path='/myRecipes'
-          render={(routeProps) => (
-            <MyRecipes
-            {...routeProps}
-            {...{
-              user: user,
-              recipes: userRecipes,
-              handleOpen: handleOpen,
-              cat: cat,
-              handleChange: handleChange,
-              group: group,
-              addArrays: addArrays,
-              handleGroup: handleGroup
-            }} />
-          )}
-        />
+          <Route path='/myRecipes'
+            render={(routeProps) => (
+              <MyRecipes
+              {...routeProps}
+              {...{
+                user: user,
+                recipes: userRecipes,
+                handleOpen: handleOpen,
+                cat: cat,
+                handleChange: handleChange,
+                group: group,
+                addArrays: addArrays,
+                handleGroup: handleGroup,
+                clearAddArrays: clearAddArrays
+              }} />
+            )}
+          />
 
-        <Route path='/addRecipe/'
-          render={(routeProps) => (
-            <AddRecipe
-            {...routeProps}
-            {...{
-              user: user,
-              createRecipeHandler: createRecipeHandler,
-              cat: cat,
-              group: group,
-              handleGroup: handleGroup
-            }} />
-          )}
-        />
+          <Route path='/addRecipe/'
+            render={(routeProps) => (
+              <AddRecipe
+              {...routeProps}
+              {...{
+                user: user,
+                createRecipeHandler: createRecipeHandler,
+                cat: cat,
+                group: group,
+                handleGroup: handleGroup,
+                addArrays: addArrays
+              }} />
+            )}
+          />
 
-        <Route path='/editRecipe/:id'
-          render={(routeProps) => (
-            <EditRecipe
-            {...routeProps}
-            {...{
-              user: user,
-              createRecipeHandler: createRecipeHandler,
-              editable, setEditable,
-              cat: cat,
-              group: group,
-              addArrays: addArrays,
-              setAddArrays:setAddArrays,
-              handleGroup: handleGroup
-            }} />
-          )}
-        />
+          <Route path='/editRecipe/:id'
+            render={(routeProps) => (
+              <EditRecipe
+              {...routeProps}
+              {...{
+                user: user,
+                createRecipeHandler: createRecipeHandler,
+                editable, setEditable,
+                cat: cat,
+                group: group,
+                addArrays: addArrays,
+                setAddArrays:setAddArrays,
+                handleGroup: handleGroup,
+                Link: Link
+              }} />
+            )}
+          />
 
-      </div>
+        </div>
+        <Footer />
+      </ScrollToTop>
     </Router>
   )
 }
